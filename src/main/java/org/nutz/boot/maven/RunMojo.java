@@ -15,7 +15,7 @@ import org.nutz.lang.Strings;
 @Mojo(name="run", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST )
 public class RunMojo extends ExecJavaMojo {
     
-    @Parameter( required = false, property = "exec.mainClass" )
+    @Parameter( required = false, property = "exec.mainClass" , alias="mainClass")
     private String mainClass;
     
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )

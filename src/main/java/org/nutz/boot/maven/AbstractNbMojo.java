@@ -29,7 +29,7 @@ public abstract class AbstractNbMojo extends AbstractMojo {
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     protected File target;
     
-    @Parameter( property = "nutzboot.maven.debug", defaultValue = "false" )
+    @Parameter( property = "nutzboot.debug", defaultValue = "false" )
     protected boolean debug;
     
     public static String searchMainClass(File target, Log log) {
