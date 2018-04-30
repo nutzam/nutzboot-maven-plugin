@@ -88,7 +88,7 @@ public class NbShadeMojo extends ShadeMojo {
                 public boolean canTransformResource(String resource) {
                     if (resource.startsWith("META-INF")) {
                         // 删除签名文件
-                        if (resource.endsWith(".SF") || resource.endsWith(".DSA"))
+                        if (resource.endsWith(".SF") || resource.endsWith(".DSA") || resource.endsWith(".RSA"))
                             return true;
                         // 删除NOTICE文件
                         if (resource.startsWith("META-INF/NOTICE"))
