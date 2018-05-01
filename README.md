@@ -7,15 +7,15 @@ NutzBoot的Maven插件
 ### 在build-plugins添加本plugin
 
 ```xml
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.nutz.boot</groupId>
-				<artifactId>nutzboot-maven-plugin</artifactId>
-				<version>${nutzboot.version}</version>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                 <groupId>org.nutz.boot</groupId>
+                 <artifactId>nutzboot-maven-plugin</artifactId>
+                 <version>${nutzboot.version}</version>
+            </plugin>
+         </plugins>
+    </build>
 ```
 
 ### 打包jar文件
@@ -70,3 +70,11 @@ public class MainLauncher {
     }
 }
 ```
+
+## 待开发的功能
+
+- [ ] war命令 将nutzboot:shade生成的jar进一步加工成war文件,供传统模式下的部署
+- [ ] init 项目初始化命令,根据一个远程/本地模板生成项目
+- [ ] upload 将jar上传到部署服务器
+- [ ] download 从部署服务器下载jar
+- [ ] repo-search 搜索部署服务器
