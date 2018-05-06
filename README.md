@@ -104,3 +104,21 @@ public class MainLauncher {
 - [ ] repo-upload 将jar上传到部署服务器
 - [ ] repo-download 从部署服务器下载jar
 - [ ] repo-search 搜索部署服务器
+
+## 如需使用快照版的,请在pom.xml中加入
+
+```xml
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nutz-snapshots</id>
+			<url>http://jfrog.nutz.cn/artifactory/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+```
