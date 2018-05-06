@@ -14,6 +14,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.util.IOUtil;
 import org.nutz.boot.tools.PropDocBean;
 import org.nutz.boot.tools.PropDocReader;
+import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -100,6 +101,7 @@ public class PropDocMojo extends AbstractNbMojo {
             }
         }
         log.info("Configure Manual:\r\n" + docReader.toMarkdown());
+        Files.write(new File(target, "configure.md"), docReader.toMarkdown());
     }
 
 }

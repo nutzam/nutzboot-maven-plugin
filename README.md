@@ -24,6 +24,18 @@ NutzBoot的Maven插件
 mvn clean package nutzboot:shade
 ```
 
+打包完成后的jar文件可以直接运行
+
+```
+java -jar XXX.jar
+```
+
+若需要设置jvm内存大小等参数:
+
+```
+java -Xmx512m -Xms512m -jar XXX.jar
+```
+
 ### 直接运行
 
 ```shell
@@ -35,6 +47,21 @@ mvn compile nutzboot:run
 ```shell
 mvn dependency:copy-dependencies nutzboot:propdoc
 ```
+
+会打印在控制台,并写入 target/configure.md 文件
+
+### 打包成war
+
+将nutzboot:shade生成的jar进一步加工成war文件,供传统模式下的部署
+
+```
+mvn clean package nutzboot:shade nutzboot:war
+```
+
+提醒, war模式下, 有部分限制:
+
+- jetty/tomcat/undertow的配置项自然会失效,它们对应的starter也会自动移除
+- server.port 若使用RPC相关的功能,应该修改成web容器的端口号
 
 ## mainClass探测规则
 
@@ -73,8 +100,7 @@ public class MainLauncher {
 
 ## 待开发的功能
 
-- [ ] war命令 将nutzboot:shade生成的jar进一步加工成war文件,供传统模式下的部署
 - [ ] init 项目初始化命令,根据一个远程/本地模板生成项目
-- [ ] upload 将jar上传到部署服务器
-- [ ] download 从部署服务器下载jar
+- [ ] repo-upload 将jar上传到部署服务器
+- [ ] repo-download 从部署服务器下载jar
 - [ ] repo-search 搜索部署服务器
