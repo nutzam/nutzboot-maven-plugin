@@ -12,6 +12,7 @@ import org.nutz.http.Request;
 import org.nutz.http.Request.METHOD;
 import org.nutz.http.Response;
 import org.nutz.http.Sender;
+import org.nutz.lang.Strings;
 import org.nutz.lang.util.NutMap;
 
 @Mojo(name = "repo-upload")
@@ -34,6 +35,11 @@ public class RepoUploadMojo extends AbstractRepoMojo {
             request.setParams(new NutMap("fileName", file.getName()));
             request.getHeader().set("Content-Type", "application/octet-stream");
             request.getHeader().set("Content-Length", ""+file.length());
+            request.getHeader().set("Connection", "close");
+            String token = readRepoToken();
+            if (!Strings.isBlank(token)) {
+                request.getHeader().set("Repo-Token", token);
+            }
             request.setInputStream(ins);
             getLog().info("Uploading... size=" + file.length());
             Response resp = Sender.create(request).send();

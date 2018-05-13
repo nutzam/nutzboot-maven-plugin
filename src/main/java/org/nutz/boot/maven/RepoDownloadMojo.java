@@ -10,9 +10,13 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.nutz.http.Http;
+import org.nutz.http.Request;
+import org.nutz.http.Request.METHOD;
 import org.nutz.http.Response;
+import org.nutz.http.Sender;
 import org.nutz.lang.Files;
 import org.nutz.lang.Streams;
+import org.nutz.lang.Strings;
 
 @Mojo(name = "repo-download")
 public class RepoDownloadMojo extends AbstractRepoMojo {
@@ -33,7 +37,12 @@ public class RepoDownloadMojo extends AbstractRepoMojo {
             String url = repoUrl + "/" + repoUser + "/" + repoAppName + "/" + repoAppVersion + "/" + file.getName() + "/";
             log.info("Download URL=" + url);
             log.info("Downloading... ");
-            Response resp = Http.get(url);
+            Request req = Request.create(url, METHOD.GET);
+            req.getHeader().set("Connection", "close");
+            String token = readRepoToken();
+            if (!Strings.isBlank(token))
+                req.getHeader().set("Repo-Token", token);
+            Response resp = Sender.create(req).send();
             if (resp.isOK()) {
                 Streams.write(out, resp.getStream());
             } else {

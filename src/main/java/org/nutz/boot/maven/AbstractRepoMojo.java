@@ -5,6 +5,9 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.nutz.json.Json;
+import org.nutz.lang.Strings;
+import org.nutz.lang.util.NutMap;
 
 public abstract class AbstractRepoMojo extends AbstractMojo {
 
@@ -25,4 +28,26 @@ public abstract class AbstractRepoMojo extends AbstractMojo {
 
     @Parameter(property = "repo.app.version", defaultValue = "${project.model.version}", required = false)
     protected String repoAppVersion;
+    
+    @Parameter(property = "repo.token", defaultValue = "", required = false)
+    protected String repoToken;
+    
+    public String readRepoToken() {
+        if (!Strings.isBlank(repoToken))
+            return repoToken.trim();
+        File authJson = new File(System.getProperty("user.home") + "/.nutzboot/repo/auth.json");
+        if (!authJson.exists())
+            return null;
+        NutMap map = Json.fromJsonFile(NutMap.class, authJson);
+        if (map.containsKey(repoUrl)) {
+            map = map.getAs(repoUrl, NutMap.class);
+        }
+        if (map.containsKey(repoUser)) {
+            map = map.getAs(repoUser, NutMap.class);
+        }
+        if (map.containsKey(repoAppName)) {
+            map = map.getAs(repoAppName, NutMap.class);
+        }
+        return map.getString("token");
+    }
 }
