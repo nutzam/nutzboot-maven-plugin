@@ -1,11 +1,15 @@
 package org.nutz.boot.maven;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.nutz.lang.Strings;
@@ -74,10 +78,20 @@ public class RepoSshUploadMojo extends AbstractRepoMojo {
             processBuilder.command().add(1, "-i");
             processBuilder.command().add(2, repoSshKeypath);
         }
+
+        Log log = getLog();
+        log.info("upload file " + uploadFileName + " to path " + uploadpath);
         try {
-            processBuilder.start();
+            Process process = processBuilder.start();
+            InputStream errorStream = process.getErrorStream();
+            if (errorStream != null) {
+                new BufferedReader(new InputStreamReader(errorStream)).lines()
+                                                                      .forEach(error -> log.error(error));
+                throw new MojoFailureException("repo-ssh-upload task fail");
+            }
         }
         catch (IOException e) {
+            log.error("repo-ssh-upload task fail", e);
             throw new MojoFailureException("ssh upload has some problem, check about ssh params PLZ");
         }
     }
