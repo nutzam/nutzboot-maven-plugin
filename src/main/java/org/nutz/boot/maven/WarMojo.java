@@ -8,11 +8,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.AttachedArtifact;
 import org.nutz.lang.Encoding;
 import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
@@ -89,6 +91,9 @@ public class WarMojo extends AbstractNbMojo {
                 // 最后,写入web.xml
                 dstZip.finish();
                 dstZip.flush();
+                AttachedArtifact artifact = new AttachedArtifact(project.getArtifact(), "", "war", null);
+                artifact.setFile(dstFile);
+                project.addAttachedArtifact(artifact);
             }
         }
         catch (Exception e) {
