@@ -1,7 +1,9 @@
 package org.nutz.boot.maven;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -33,8 +35,9 @@ public class RepoSshUploadMojo extends AbstractRepoMojo {
         }
 
         if (file == null) {
-            if (project == null)
+            if (project == null) {
                 throw new MojoFailureException("require repo.file or pom.xml!!!");
+            }
             file = project.getArtifact().getFile();
         }
         if (!file.exists()) {
@@ -52,13 +55,20 @@ public class RepoSshUploadMojo extends AbstractRepoMojo {
 
         String uploadpath = String.join("/", repoSshUploadpath.split("/"));
 
+        String uploadFileName = file.getName();
+        List<Artifact> attachedArtifacts = project.getAttachedArtifacts();
+        Artifact artifact = attachedArtifacts.get(attachedArtifacts.size() - 1);
+        if (null != artifact && "war".equals(artifact.getClassifier())) {
+            uploadFileName = artifact.getFile().getName();
+        }
+
         ProcessBuilder processBuilder = new ProcessBuilder("scp",
                                                            file.getPath(),
                                                            String.format("%s@%s:%s/%s",
                                                                          repoSshUser,
                                                                          repoSshServer,
                                                                          uploadpath,
-                                                                         file.getName()));
+                                                                         uploadFileName));
 
         if (!Strings.isEmpty(repoSshKeypath)) {
             processBuilder.command().add(1, "-i");
