@@ -8,7 +8,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -25,6 +24,7 @@ public class WarMojo extends AbstractNbMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (Strings.isBlank(mainClass)) {
             mainClass = AbstractNbMojo.searchMainClass(target, getLog());
@@ -33,7 +33,7 @@ public class WarMojo extends AbstractNbMojo {
         org.apache.maven.plugin.logging.Log log = getLog();
         log.info("Convert " + jarFile.getName());
         try {
-            File dstFile = new File(jarFile.getParentFile(), jarFile.getName().substring(0, jarFile.getName().length() - 3) + "war");
+            File dstFile = new File(jarFile.getParentFile(), project.getArtifactId() + ".war");
             try (ZipInputStream sourceZip = new ZipInputStream(new FileInputStream(jarFile));
                     ZipOutputStream dstZip = new ZipOutputStream(new FileOutputStream(dstFile), Encoding.CHARSET_UTF8)) {
                 ZipEntry sourceEn = null;
