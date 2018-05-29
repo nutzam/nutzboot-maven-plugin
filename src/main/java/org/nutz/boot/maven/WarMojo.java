@@ -84,11 +84,17 @@ public class WarMojo extends AbstractNbMojo {
                     Streams.write(dstZip, sourceZip);
                     dstZip.closeEntry();
                 }
+                if (!Strings.isBlank(nbStarterMark)) {
+                    dstZip.putNextEntry(new ZipEntry("WEB-INF/classes/META-INF/nutz/org.nutz.boot.starter.NbStarter"));
+                    dstZip.write(nbStarterMark.getBytes(Encoding.CHARSET_UTF8));
+                    dstZip.closeEntry();
+                }
+                // 最后,写入web.xml
                 webXml = createOrRewriteWebXml(webXml, mainClass);
                 dstZip.putNextEntry(new ZipEntry("WEB-INF/web.xml"));
                 dstZip.write(webXml.getBytes(Encoding.CHARSET_UTF8));
                 dstZip.closeEntry();
-                // 最后,写入web.xml
+                
                 dstZip.finish();
                 dstZip.flush();
                 AttachedArtifact artifact = new AttachedArtifact(project.getArtifact(), "", "war", null);
