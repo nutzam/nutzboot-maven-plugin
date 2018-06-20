@@ -1,12 +1,18 @@
 package org.nutz.boot.maven;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -19,7 +25,10 @@ import org.apache.maven.plugins.shade.resource.AppendingTransformer;
 import org.apache.maven.plugins.shade.resource.ManifestResourceTransformer;
 import org.apache.maven.plugins.shade.resource.ResourceTransformer;
 import org.apache.maven.plugins.shade.resource.ServicesResourceTransformer;
+import org.apache.maven.project.MavenProject;
+import org.nutz.lang.Encoding;
 import org.nutz.lang.Mirror;
+import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 
 @Mojo(name = "shade", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
@@ -30,8 +39,14 @@ public class NbShadeMojo extends ShadeMojo {
 
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     protected File target;
+    
+    @Parameter(required=false)
+    private boolean compression = true;
 
     protected Field transformersField;
+    
+    @Parameter(defaultValue = "${project}", readonly = true, required = false)
+    protected MavenProject project2;
 
     public NbShadeMojo() throws Exception {
         transformersField = ShadeMojo.class.getDeclaredField("transformers");
@@ -108,6 +123,38 @@ public class NbShadeMojo extends ShadeMojo {
             throw new MojoExecutionException("fail to get/set transformers", e);
         }
         super.execute();
+        if (!compression) {
+            getLog().info("making uncompress jar ...");
+            File mainZip = project2.getArtifact().getFile();
+            long time = System.currentTimeMillis();
+            FileTime t2 = FileTime.fromMillis(time);
+            File tmpZip = new File(mainZip + ".zip");
+            try (ZipInputStream ins = new ZipInputStream(new FileInputStream(mainZip), Encoding.CHARSET_UTF8);
+                    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmpZip), Encoding.CHARSET_UTF8)) {
+                out.setLevel(ZipOutputStream.STORED);
+                ZipEntry en = null;
+                ZipEntry en2 = null;
+                while ((en = ins.getNextEntry()) != null) {
+                    en2 = new ZipEntry(en.getName());
+                    en2.setLastModifiedTime(t2);
+                    en2.setTime(time);
+                    en2.setCreationTime(t2);
+                    en2.setLastAccessTime(t2);
+                    out.putNextEntry(en2);
+                    if (!en.isDirectory()) {
+                        Streams.write(out, ins);
+                    }
+                    out.closeEntry();
+                }
+                out.flush();
+            }
+            catch (Exception e) {
+                throw new MojoExecutionException("error when doing unzip", e);
+            }
+            getLog().info("replace origin jar ...");
+            mainZip.renameTo(new File(mainZip.getParent(), "shade-" + mainZip.getName()));
+            tmpZip.renameTo(mainZip);
+        }
     }
 
 }
