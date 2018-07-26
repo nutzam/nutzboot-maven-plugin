@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -78,7 +79,19 @@ public class NbShadeMojo extends ShadeMojo {
             }
             // TODO 转换CXF的META-INF/cxf/bus-extensions.txt
             if (!hasManifestResourceTransformer) {
-                ManifestResourceTransformer rt = new ManifestResourceTransformer();
+                ManifestResourceTransformer rt = new ManifestResourceTransformer() {
+                    @Override
+                    public void modifyOutputStream(JarOutputStream jos) throws IOException {
+                        super.modifyOutputStream(jos);
+                        JarEntry en = new JarEntry("build.version");
+                        jos.putNextEntry(en);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("version=").append(project2.getVersion()).append("\r\n");
+                        sb.append("buildNumber=").append("0.0");
+                        jos.write(sb.toString().getBytes());
+                        jos.closeEntry();
+                    }
+                };
                 if (Strings.isBlank(mainClass)) {
                     mainClass = AbstractNbMojo.searchMainClass(target, getLog());
                 }
@@ -112,6 +125,8 @@ public class NbShadeMojo extends ShadeMojo {
                         if (resource.startsWith("META-INF/LICENSE"))
                             return true;
                     }
+                    if (resource.startsWith("rest-management-private-classpath/"))
+                        return true;
                     return false;
                 }
             });
