@@ -9,6 +9,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.exec.ExecJavaMojo;
 import org.nutz.lang.Strings;
 
@@ -36,6 +37,11 @@ public class RunMojo extends ExecJavaMojo {
                 log.error("bad bad bad", e);
                 throw new MojoFailureException("bad bad bad", e);
             }
+        }
+        if (project != null) {
+            System.setProperty("app.build.version", project.getVersion());
+            System.setProperty("app.build.groupId", project.getGroupId());
+            System.setProperty("app.build.artifactId", project.getArtifactId());
         }
         super.execute();
     }

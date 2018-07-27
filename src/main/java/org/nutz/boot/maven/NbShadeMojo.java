@@ -86,8 +86,10 @@ public class NbShadeMojo extends ShadeMojo {
                         JarEntry en = new JarEntry("build.version");
                         jos.putNextEntry(en);
                         StringBuilder sb = new StringBuilder();
-                        sb.append("version=").append(project2.getVersion()).append("\r\n");
-                        sb.append("buildNumber=").append("0.0");
+                        sb.append("app.build.version=").append(project2.getVersion()).append("\r\n");
+                        sb.append("app.build.groupId=").append(project2.getGroupId()).append("\r\n");
+                        sb.append("app.build.artifactId=").append(project2.getArtifactId()).append("\r\n");
+                        sb.append("buildNumber=").append("_"); // TODO 读取VCS的版本号
                         jos.write(sb.toString().getBytes());
                         jos.closeEntry();
                     }
