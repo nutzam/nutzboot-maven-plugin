@@ -23,6 +23,9 @@ public class WarMojo extends AbstractNbMojo {
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
+    
+    @Parameter( property = "nutzboot.mainPackage", defaultValue = "")
+    protected String mainPackage;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -110,7 +113,10 @@ public class WarMojo extends AbstractNbMojo {
     protected String createOrRewriteWebXml(String sourceWebXml, String mainClass) {
         StringBuilder sb = new StringBuilder();
         sb.append("<listener><listener-class>org.nutz.boot.starter.servlet3.NbServletContextListener</listener-class></listener>\r\n");
-        sb.append("<context-param><param-name>nutzboot.mainClass</param-name><param-value>").append(mainClass).append("</param-value></context-param>");
+        sb.append("<context-param><param-name>nutzboot.mainClass</param-name><param-value>").append(mainClass).append("</param-value></context-param>\r\n");
+        if (Strings.isNotBlank(mainPackage)) {
+            sb.append("<context-param><param-name>nutzboot.mainPackage</param-name><param-value>").append(mainPackage).append("</param-value></context-param>\r\b");
+        }
         if (Strings.isBlank(sourceWebXml)) {
             return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<web-app>\r\n    " + sb + "\r\n</web-app>";
         } else {
