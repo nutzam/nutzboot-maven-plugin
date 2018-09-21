@@ -159,8 +159,8 @@ public class NbShadeMojo extends ShadeMojo {
         }
         if (dst != null) {
             // final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "." + artifact.getArtifactHandler().getExtension()
-            Mirror.me(this).setValue(this, "outputDirectory", dst);
-            Mirror.me(this).setValue(this, "outputFile", project2.getArtifactId() + "-" + project2.getVersion() + ".jar");
+            //Mirror.me(this).setValue(this, "outputDirectory", dst);
+            Mirror.me(this).setValue(this, "outputFile", new File(dst, project2.getArtifactId() + "-" + project2.getVersion() + ".jar"));
         }
         super.execute();
         if (!compression) {
