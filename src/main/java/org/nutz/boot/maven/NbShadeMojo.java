@@ -55,6 +55,8 @@ public class NbShadeMojo extends ShadeMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        if ("pom".equals(project2.getPackaging()))
+            return;
         // 设置transformers
         try {
             ResourceTransformer[] transformers = (ResourceTransformer[]) transformersField.get(this);
@@ -83,15 +85,19 @@ public class NbShadeMojo extends ShadeMojo {
                     @Override
                     public void modifyOutputStream(JarOutputStream jos) throws IOException {
                         super.modifyOutputStream(jos);
-                        JarEntry en = new JarEntry("build.version");
-                        jos.putNextEntry(en);
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("app.build.version=").append(project2.getVersion()).append("\r\n");
-                        sb.append("app.build.groupId=").append(project2.getGroupId()).append("\r\n");
-                        sb.append("app.build.artifactId=").append(project2.getArtifactId()).append("\r\n");
-                        sb.append("buildNumber=").append("_"); // TODO 读取VCS的版本号
-                        jos.write(sb.toString().getBytes());
-                        jos.closeEntry();
+                        try {
+                            JarEntry en = new JarEntry("build.version");
+                            jos.putNextEntry(en);
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("app.build.version=").append(project2.getVersion()).append("\r\n");
+                            sb.append("app.build.groupId=").append(project2.getGroupId()).append("\r\n");
+                            sb.append("app.build.artifactId=").append(project2.getArtifactId()).append("\r\n");
+                            sb.append("buildNumber=").append("_"); // TODO 读取VCS的版本号
+                            jos.write(sb.toString().getBytes());
+                            jos.closeEntry();
+                        }
+                        catch (Throwable e) {
+                        }
                     }
                 };
                 if (Strings.isBlank(mainClass)) {
@@ -128,6 +134,8 @@ public class NbShadeMojo extends ShadeMojo {
                             return true;
                     }
                     if (resource.startsWith("rest-management-private-classpath/"))
+                        return true;
+                    if (resource.equals("build.version"))
                         return true;
                     return false;
                 }
