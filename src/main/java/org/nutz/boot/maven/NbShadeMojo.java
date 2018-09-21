@@ -32,7 +32,7 @@ import org.nutz.lang.Mirror;
 import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 
-@Mojo(name = "shade", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "shade", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class NbShadeMojo extends ShadeMojo {
 
     @Parameter(required = false, property = "nutzboot.mainClass")
@@ -40,6 +40,9 @@ public class NbShadeMojo extends ShadeMojo {
 
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     protected File target;
+    
+    @Parameter(required = false, property = "nutzboot.dst")
+    protected File dst;
     
     @Parameter(required=false)
     private boolean compression = true;
@@ -57,6 +60,13 @@ public class NbShadeMojo extends ShadeMojo {
     public void execute() throws MojoExecutionException {
         if ("pom".equals(project2.getPackaging()))
             return;
+        if (Strings.isBlank(mainClass)) {
+            mainClass = AbstractNbMojo.searchMainClass(target, getLog());
+        }
+        if (Strings.isBlank(mainClass)) {
+            getLog().info("MainLaucher not found, skip this action!!!");
+            return;
+        }
         // 设置transformers
         try {
             ResourceTransformer[] transformers = (ResourceTransformer[]) transformersField.get(this);
@@ -146,6 +156,11 @@ public class NbShadeMojo extends ShadeMojo {
         }
         catch (Throwable e) {
             throw new MojoExecutionException("fail to get/set transformers", e);
+        }
+        if (dst != null) {
+            // final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "." + artifact.getArtifactHandler().getExtension()
+            Mirror.me(this).setValue(this, "outputDirectory", dst);
+            Mirror.me(this).setValue(this, "outputFile", project2.getArtifactId() + "-" + project2.getVersion() + ".jar");
         }
         super.execute();
         if (!compression) {

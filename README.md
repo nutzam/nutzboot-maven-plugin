@@ -36,6 +36,13 @@ java -jar XXX.jar
 java -Xmx512m -Xms512m -jar XXX.jar
 ```
 
+多模块打包并输出到指定目录
+```
+// 在项目根目录执行
+mvn -Dnutzboot.dst=E:/dst clean package nutzboot:shade
+// 会在E:/dst目录生成多个子模块的可运行jar
+```
+
 ### 直接运行
 
 ```shell
