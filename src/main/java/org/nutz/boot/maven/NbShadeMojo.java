@@ -89,7 +89,7 @@ public class NbShadeMojo extends ShadeMojo {
             if (!hasServicesResourceTransformer) {
                 transformers2.add(new ServicesResourceTransformer());
             }
-            // TODO 转换CXF的META-INF/cxf/bus-extensions.txt
+            // 添加build.version
             if (!hasManifestResourceTransformer) {
                 ManifestResourceTransformer rt = new ManifestResourceTransformer() {
                     @Override
@@ -119,6 +119,10 @@ public class NbShadeMojo extends ShadeMojo {
             // 转换NbStater文件
             AppendingTransformer at = new AppendingTransformer();
             Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/nutz/org.nutz.boot.starter.NbStarter");
+            transformers2.add(at);
+            // 转换CXF的BUS扩展文件
+            at = new AppendingTransformer();
+            Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/cxf/bus-extensions.txt");
             transformers2.add(at);
             
             // 过滤签名文件
