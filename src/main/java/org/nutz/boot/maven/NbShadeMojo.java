@@ -124,6 +124,13 @@ public class NbShadeMojo extends ShadeMojo {
             at = new AppendingTransformer();
             Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/cxf/bus-extensions.txt");
             transformers2.add(at);
+            // 转换Spring的各种扩展文件
+            at = new AppendingTransformer();
+            Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/spring.handlers");
+            transformers2.add(at);
+            at = new AppendingTransformer();
+            Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/spring.schemas");
+            transformers2.add(at);
             
             // 过滤签名文件
             transformers2.add(new ResourceTransformer() {
