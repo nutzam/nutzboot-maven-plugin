@@ -131,6 +131,10 @@ public class NbShadeMojo extends ShadeMojo {
             at = new AppendingTransformer();
             Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/spring.schemas");
             transformers2.add(at);
+            // 转换dubbo的filters文件
+            at = new AppendingTransformer();
+            Mirror.me(AppendingTransformer.class).setValue(at, "resource", "META-INF/dubbo/com.alibaba.dubbo.rpc.Filter");
+            transformers2.add(at);
             
             // 过滤签名文件
             transformers2.add(new ResourceTransformer() {
