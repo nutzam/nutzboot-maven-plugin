@@ -60,6 +60,7 @@ public class WarMojo extends AbstractNbMojo {
                         // 需要跳过web容器的类, jetty/tomcat/undertow的package
                         for (String pkg : Arrays.asList("org/eclipse/jetty/server",
                                                         "org/eclipse/jetty/webapp",
+                                                        "org/eclipse/jetty/websocket/jsr356/server",
                                                         "io/undertow",
                                                         "org/apache/catalina",
                                                         "javax/servlet",
