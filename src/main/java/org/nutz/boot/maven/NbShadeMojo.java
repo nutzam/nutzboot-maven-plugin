@@ -15,6 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -175,7 +176,16 @@ public class NbShadeMojo extends ShadeMojo {
         if (dst != null) {
             // final String shadedName = shadedArtifactId + "-" + artifact.getVersion() + "-" + shadedClassifierName + "." + artifact.getArtifactHandler().getExtension()
             //Mirror.me(this).setValue(this, "outputDirectory", dst);
-            Mirror.me(this).setValue(this, "outputFile", new File(dst, project2.getArtifactId() + "-" + project2.getVersion() + ".jar"));
+            String fileName = project2.getArtifactId() + "-"+  project2.getVersion();
+            Build build = project2.getBuild();
+            if(build!=null){
+                String finalName = build.getFinalName();
+                if(Strings.isNotBlank(finalName)){
+                    fileName  = finalName;
+                }
+            }
+
+            Mirror.me(this).setValue(this, "outputFile", new File(dst, fileName + ".jar"));
         }
         super.execute();
         if (!compression) {
